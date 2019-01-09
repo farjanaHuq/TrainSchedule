@@ -4,9 +4,12 @@
     color: white;
 }
 
-#employee-roster {
-}
-
 #submission-form {
     margin-bottom: 30px;
+}
+
+.edit-btn, .remove-btn {
+    border-radius: 0.5px;
+    margin-right: 20px;
+    margin-top: 7px;
 }
