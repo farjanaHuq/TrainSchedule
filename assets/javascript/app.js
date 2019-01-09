@@ -16,8 +16,75 @@ var config = {
     var database = firebase.database();
     var trainInfo = [];
     
-    // Edit child from database
-    // Remove child from database
+    //callback function to update table info
+    function updateTableInfo(i){
+        console.log('Update table');
+        $(`#name${trainInfo[i].firebaseID}`).text(trainInfo[i].trainName);
+        $(`#destination${trainInfo[i].firebaseID}`).text(trainInfo[i].destination);
+        $(`#frequency${trainInfo[i].firebaseID}`).text(trainInfo[i].frequency);
+
+        $(`#nextArrival${trainInfo[i].firebaseID}`).text(moment().add(calculateMinutesAway(i), 'm').format('LT'));
+        $(`#minutesAway${trainInfo[i].firebaseID}`).text(calculateMinutesAway(i));
+    }
+
+    // Change child from database
+    database.ref().on('child_changed', function(snap){
+        var i = trainInfo.findIndex(i => i.firebaseID === snap.ref_.key);
+        trainInfo[i] = {
+            'firebaseID' : snap.ref_.key,
+            'trainName': snap.val().trainName,
+            'destination': snap.val().destination,
+            'firstTrainTime': snap.val().firstTrainTime,
+            'frequency': snap.val().frequency,
+        }
+        calculateMinutesAway(i);
+        updateTableInfo(i);
+    });
+    // Onclick function to Confirm child edit from database
+    $(document).on('click', '.edit-btn', function(e){
+        e.preventDefault();
+        console.log('confirm');
+        
+        $(`#name${$(this).attr('data-id')}`).attr('contentEditable' , false);
+        $(`#destination${$(this).attr('data-id')}`).attr('contentEditable' , false);
+        $(`#frequency${$(this).attr('data-id')}`).attr('contenteditable', false);
+
+        $(this).attr('class', 'btn edit-btn');
+        $(this).text('Edit');
+        
+        //edit the train info from database
+        database.ref().child($(this).attr('data-id')).set({
+            trainName: $(`#name${$(this).attr('data-id')}`).text(),
+            destination: $(`#destination${$(this).attr('data-id')}`).text(),
+            firstTrainTime: $(`#frequency${$(this).attr('data-id')}`).attr('data-firstTrainTime'),
+            frequency: $(`#frequency${$(this).attr('data-id')}`).text(),
+        });
+        for(var i=0; i<trainInfo.length ; i++){
+            calculateMinutesAway(i);
+            updateTableInfo(i);
+        }
+    });
+
+    //Onclick function to Edit child from database
+    $(document).on('click', '.edit-btn', function(e){
+        e.preventDefault();
+        console.log('edit');
+
+        $(`#name${$(this).attr('data-id')}`).attr('contentEditable' , true);
+        $(`#destination${$(this).attr('data-id')}`).attr('contentEditable' , true);
+        $(`#frequency${$(this).attr('data-id')}`).attr('contenteditable', true);
+
+        //Create an attribute button Confirm
+        $(this).attr('class', 'btn confirm-btn');
+        //write text 
+        $(this).text('Confirm');
+
+        // clear timeout/interval so it doesn't update while you're trying to change the text
+        // clearTimeout(updateTimeout);
+        // clearInterval(updateInterval);
+    });
+
+    // Onclick function to Remove child from database
     $(document).on('click', '.remove-btn', function(e){
         e.preventDefault();
         console.log('hello');
