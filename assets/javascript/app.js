@@ -87,7 +87,7 @@ var config = {
     // Onclick function to Remove child from database
     $(document).on('click', '.remove-btn', function(e){
         e.preventDefault();
-        console.log('hello');
+        console.log('remove');
 
         database.ref().child($(this).attr('data-id')).remove();
         var i = trainInfo.findIndex(i => i.firebaseID === $(this).attr('data-id'))
@@ -116,7 +116,8 @@ var config = {
         $('#train-table-body').append(`<tr id= "row${snap.ref_.key}">`);
         $(`#row${snap.ref_.key}`).append(`<td id= 'name${snap.ref_.key}' >${snap.val().trainName}</td>`);
         $(`#row${snap.ref_.key}`).append(`<td id= 'destination${snap.ref_.key}'>${snap.val().destination}</td>`);
-        $(`#row${snap.ref_.key}`).append(`<td id= 'frequency${snap.ref_.key}'>${snap.val().frequency}</td>`);
+        $(`#row${snap.ref_.key}`).append(`<td id= 'frequency${snap.ref_.key} data-firstTrainTime = '${snap.val().firstTrainTime}'>${snap.val().frequency}</td>`);
+
         $(`#row${snap.ref_.key}`).append(`<td id= 'nextArrival${snap.ref_.key}'>
                  ${moment().add(calculateMinutesAway(i), 'm').format('LT')}</td>`);
         $(`#row${snap.ref_.key}`).append(`<td id= 'minutesAway${snap.ref_.key}'>${calculateMinutesAway(i)}</td>`);
